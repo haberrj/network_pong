@@ -8,6 +8,15 @@ import pygame, sys
 from pygame.locals import *
 import Game.pong_class as pc
 import Backend.network as network
+import argparse
+
+parser = argparse.ArgumentParser(description="Play pong with yourself or with friends. Add the server IP Address and Port.")
+parser.add_argument("-i", "--ip", type=str, required=True, help="The IP address of the server.")
+parser.add_argument("-p", "--port", type=int, required=True, help="The Port of the server to access.")
+
+args = parser.parse_args()
+ip_address = args.ip
+port = args.port
 
 # Available colours for render
 WHITE = (255, 255, 255)
@@ -47,7 +56,7 @@ def main():
     scores = [0,0,0,0]
     ball_pos = [0,0]
     running = True
-    n = network.Network('195.90.200.226', 5555)
+    n = network.Network(ip_address, port)
 
     while(n.getP() is None):
         continue
@@ -58,7 +67,7 @@ def main():
     my_paddle_pos = my_info[0][1]
     data = my_paddle_pos
     num_users = 1
-    game = pc.pong_class(num_of_users=num_users) # initialize it as 1 until it gets updated in the loop
+    game = pc.pong_class() # initialize it as 1 until it gets updated in the loop
     # spawn the ball
     game.spawn_ball(my_info[1])
     
@@ -73,8 +82,7 @@ def main():
         if(new_num_users != num_users):
             print("A new user has joined.")
             num_users = new_num_users
-            print(num_users)
-            game = pc.pong_class(num_of_users=num_users)
+            game = pc.pong_class()
             game.spawn_ball(ball_vel)
         game.canvas.fill(BLACK)
         pygame.draw.circle(game.canvas, WHITE, [game.WIDTH//2, game.HEIGHT//2], 70, 1)

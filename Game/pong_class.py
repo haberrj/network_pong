@@ -4,8 +4,7 @@
 # Date: 22.5.2021
 # A class to create the game for use within the network
 
-import random
-import pygame, sys
+import pygame
 from pygame.locals import *
 
 # Available colours for render
@@ -16,14 +15,13 @@ BLACK = (0, 0, 0)
 YELLOW = (255, 255, 0)
 
 class pong_class(object):
-    def __init__(self, width=600, height=600, ball_radius=20, pad_width=10, pad_height=100, num_of_users=2):
+    def __init__(self, width=600, height=600, ball_radius=20, pad_width=10, pad_height=100):
         '''Will initialize the game with specific parameters for use within the algorithm.
         @param width: An integer for the width of the game in pixels.
         @param height: An integer for the height of the game in pixels.
         @param ball_radius: An integer for the radius of the ball in pixels.
         @param pad_width: An integer for the width of the paddle in pixels.
         @param pad_height: An integer for the height of the paddle in pixels.
-        @param num_of_users: An integer for the desired number of users (1-4).
         '''
         pygame.init()
         self.fps = pygame.time.Clock()
@@ -35,12 +33,6 @@ class pong_class(object):
         self.PAD_HEIGHT = pad_height
         self.HALF_PAD_WIDTH = self.PAD_WIDTH/2 # I will reverse PAD WIDTH and HEIGHT for users 3 and 4
         self.HALF_PAD_HEIGHT = self.PAD_HEIGHT/2
-        if(type(num_of_users) != int):
-            raise TypeError("num_of_users is expected to be an if integer type.")
-        elif(num_of_users < 1 or num_of_users > 4):
-            raise ValueError("num_of_users must be an integer between 1 and 4.")
-        else:
-            self.num_of_users = num_of_users
         # Setting the availability of the paddles based on the user
         self.paddle_availability = [0, 0, 0, 0]
         # Other needed class values
@@ -156,48 +148,6 @@ class pong_class(object):
                 [self.paddle_pos[3][0] + self.HALF_PAD_HEIGHT, self.paddle_pos[3][1] + self.HALF_PAD_WIDTH], 
                 [self.paddle_pos[3][0] + self.HALF_PAD_HEIGHT, self.paddle_pos[3][1] - self.HALF_PAD_WIDTH]], 
                 0)
-        # counter = 0
-        # for i in len(self.paddle_pos):
-        #     if(counter + 1 > self.num_of_users):
-        #         break
-        #     if(counter < 2): # for users 1 & 2
-        #         if ((self.paddle_pos[i][1] > self.HALF_PAD_HEIGHT) and (self.paddle_pos[i][1] < self.HEIGHT - self.HALF_PAD_HEIGHT)):
-        #             self.paddle_pos[i][1] += self.paddle_vel[counter]
-        #         elif ((self.paddle_pos[i][1] == self.HALF_PAD_HEIGHT) and (self.paddle_vel[counter] > 0)):
-        #             self.paddle_pos[i][1] += self.paddle_vel[counter]
-        #         elif ((self.paddle_pos[i][1] == self.HEIGHT - self.HALF_PAD_HEIGHT) and (self.paddle_vel[counter] < 0)):
-        #             self.paddle_pos[i][1] += self.paddle_vel[counter]
-        #         else: # Stops the paddle from getting stuck at the bottom
-        #             if(self.paddle_pos[i][1] > self.HEIGHT/2):
-        #                 self.paddle_pos[i][1] = self.HEIGHT - self.HALF_PAD_HEIGHT
-        #             else:
-        #                 self.paddle_pos[i][1] = self.HALF_PAD_HEIGHT
-        #         # print(self.paddle_pos[i])
-        #         pygame.draw.polygon(self.canvas, GREEN, 
-        #             [[self.paddle_pos[i][0] - self.HALF_PAD_WIDTH, self.paddle_pos[i][1] - self.HALF_PAD_HEIGHT], 
-        #             [self.paddle_pos[i][0] - self.HALF_PAD_WIDTH, self.paddle_pos[i][1] + self.HALF_PAD_HEIGHT], 
-        #             [self.paddle_pos[i][0] + self.HALF_PAD_WIDTH, self.paddle_pos[i][1] + self.HALF_PAD_HEIGHT], 
-        #             [self.paddle_pos[i][0] + self.HALF_PAD_WIDTH, self.paddle_pos[i][1] - self.HALF_PAD_HEIGHT]], 
-        #             0)
-        #     else: # for users 3 & 4
-        #         if ((self.paddle_pos[i][0] > self.HALF_PAD_HEIGHT) and (self.paddle_pos[i][0] < self.WIDTH - self.HALF_PAD_HEIGHT)):
-        #             self.paddle_pos[i][0] += self.paddle_vel[counter]
-        #         elif ((self.paddle_pos[i][0] == self.HALF_PAD_HEIGHT) and (self.paddle_vel[counter] > 0)):
-        #             self.paddle_pos[i][0] += self.paddle_vel[counter]
-        #         elif ((self.paddle_pos[i][0] == self.WIDTH - self.HALF_PAD_HEIGHT) and (self.paddle_vel[counter] < 0)):
-        #             self.paddle_pos[i][0] += self.paddle_vel[counter]
-        #         else: # Stops the paddle from getting stuck at the bottom
-        #             if(self.paddle_pos[i][0] > self.WIDTH/2):
-        #                 self.paddle_pos[i][0] = self.WIDTH - self.HALF_PAD_HEIGHT
-        #             else:
-        #                 self.paddle_pos[i][0] = self.HALF_PAD_HEIGHT
-        #         pygame.draw.polygon(self.canvas, GREEN, 
-        #             [[self.paddle_pos[i][0] - self.HALF_PAD_HEIGHT, self.paddle_pos[i][1] - self.HALF_PAD_WIDTH], 
-        #             [self.paddle_pos[i][0] - self.HALF_PAD_HEIGHT, self.paddle_pos[i][1] + self.HALF_PAD_WIDTH], 
-        #             [self.paddle_pos[i][0] + self.HALF_PAD_HEIGHT, self.paddle_pos[i][1] + self.HALF_PAD_WIDTH], 
-        #             [self.paddle_pos[i][0] + self.HALF_PAD_HEIGHT, self.paddle_pos[i][1] - self.HALF_PAD_WIDTH]], 
-        #             0)
-        #     counter += 1
 
     def update_scores(self):
         '''Will update the score variables and draw the scores on the field based on

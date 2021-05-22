@@ -4,15 +4,17 @@
 # Date: 22.5.2021
 # This script will be server based for communication with users.
 
-import socket, sys, pickle
+import socket, pickle
 from _thread import *
-import random
+import random, argparse
 
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLACK = (0, 0, 0)
-YELLOW = (255, 255, 0)
+parser = argparse.ArgumentParser(description="The server script for the pong game. Add the server IP Address and Port.")
+parser.add_argument("-i", "--ip", type=str, required=True, help="The IP address of the server.")
+parser.add_argument("-p", "--port", type=int, required=True, help="The Port of the server to access.")
+
+args = parser.args
+server = args.ip
+port = args.port
 
 def threaded_client(conn, player):
     conn.send(pickle.dumps([players[player], ball_vel]))
@@ -36,8 +38,8 @@ def threaded_client(conn, player):
                     reply = [players[0], players[1], players[2], ball_vel]
                 else:
                     reply = '' # Will prevent a 5th player from joining the game
-                # print("Received from Player", player, ":", data)
-                # print("Sending to Player", player, ':', reply)
+                print("Received from Player", player, ":", data)
+                print("Sending to Player", player, ':', reply)
             conn.sendall(pickle.dumps(reply))
         except:
             break
@@ -45,8 +47,6 @@ def threaded_client(conn, player):
     print("Lost Connection to Client: ", player + 1)
     conn.close()
 
-server = '195.90.200.226' # I have a VPS and this is the IP address for it
-port = 5555
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
