@@ -48,7 +48,9 @@ def main():
     while(n.getP() is None):
         continue
     my_info = n.getP() # This is the received value from the server
+    print("Connected to Server!")
     my_user = my_info[0][0]
+    print("You are User 1")
     my_paddle_pos = my_info[0][1]
     data = my_paddle_pos
     num_users = 1
@@ -84,8 +86,7 @@ def main():
             elif(event.type == K_ESCAPE):
                 pygame.quit()
                 sys.exit()
-        my_paddle_pos = game.paddle_pos[my_user + 1]
-        # print(my_paddle_pos)
+        my_paddle_pos = game.paddle_pos[my_user - 1]
         data = my_paddle_pos
         pygame.display.flip()
         pygame.display.update()
