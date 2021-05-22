@@ -71,24 +71,26 @@ while(True):
     lst.append(conn)
     lst.append(address)
     ball_vel = [random.randrange(2,4), random.randrange(1,3)]
-    print(len(total))
-    if(len(total) > 0):
-        conn1 = lst[0]
-        address1 = lst[1]
-        start_new_thread(threaded_client, (conn1, current_player))
-        current_player += 1
-    if(len(total) > 1):
-        conn2 = lst[2]
-        address2 = lst[3]
-        start_new_thread(threaded_client, (conn1, current_player))
-        current_player += 1
-    if(len(total) > 2):
-        conn3 = lst[4]
-        address3 = lst[5]
-        start_new_thread(threaded_client, (conn1, current_player))
-        current_player += 1
-    if(len(total) > 3):
-        conn4 = lst[6]
-        address4 = lst[7]
-        start_new_thread(threaded_client, (conn1, current_player))
-        current_player += 1
+    start_new_thread(threaded_client, (conn, current_player))
+    current_player += 1
+    # print(len(total))
+    # if(len(total) > 0):
+    #     conn1 = lst[0]
+    #     address1 = lst[1]
+    #     start_new_thread(threaded_client, (conn1, current_player))
+    #     current_player += 1
+    # if(len(total) > 1):
+    #     conn2 = lst[2]
+    #     address2 = lst[3]
+    #     start_new_thread(threaded_client, (conn2, current_player))
+    #     current_player += 1
+    # if(len(total) > 2):
+    #     conn3 = lst[4]
+    #     address3 = lst[5]
+    #     start_new_thread(threaded_client, (conn3, current_player))
+    #     current_player += 1
+    # if(len(total) > 3):
+    #     conn4 = lst[6]
+    #     address4 = lst[7]
+    #     start_new_thread(threaded_client, (conn4, current_player))
+    #     current_player += 1
