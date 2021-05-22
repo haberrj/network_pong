@@ -75,5 +75,5 @@ while(True):
     ball_vel = [random.randrange(2,4), random.randrange(1,3)]
     start_new_thread(threaded_client, (conn, current_player))
     connected_players[current_player] = 1
-    print(connected_players)
+    # print(connected_players)
     current_player += 1
