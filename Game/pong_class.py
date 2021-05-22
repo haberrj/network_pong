@@ -13,6 +13,7 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
+YELLOW = (255, 255, 0)
 
 class pong_class(object):
     def __init__(self, width=600, height=600, ball_radius=20, pad_width=10, pad_height=100, num_of_users=2):
@@ -141,10 +142,10 @@ class pong_class(object):
         the number participants in the game.
         '''
         system_font = pygame.font.SysFont("Comic Sans MS", 20) # Hope you guys like it ;)
-        label_user1 = system_font.render("User 1 Score " + str(self.scores[0]), 1, (255, 255, 0))
-        label_user2 = system_font.render("User 2 Score " + str(self.scores[1]), 1, (255, 255, 0))
-        label_user3 = system_font.render("User 3 Score " + str(self.scores[2]), 1, (255, 255, 0))
-        label_user4 = system_font.render("User 4 Score " + str(self.scores[3]), 1, (255, 255, 0))
+        label_user1 = system_font.render("User 1 Score " + str(self.scores[0]), 1, YELLOW)
+        label_user2 = system_font.render("User 2 Score " + str(self.scores[1]), 1, YELLOW)
+        label_user3 = system_font.render("User 3 Score " + str(self.scores[2]), 1, YELLOW)
+        label_user4 = system_font.render("User 4 Score " + str(self.scores[3]), 1, YELLOW)
         # Draw the scores on the board
         self.canvas.blit(label_user1, (2*self.PAD_WIDTH, self.HEIGHT/2))    
         if(self.num_of_users > 1):
