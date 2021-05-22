@@ -4,19 +4,18 @@
 # Date: 22.5.2021
 # A class to create the game for use within the network
 
-from Game.game import BALL_RADIUS, HALF_PAD_WIDTH, HEIGHT, PAD_WIDTH, spawn_ball
 import random
 import pygame, sys
 from pygame.locals import *
 
-# Avaiable colours for render
+# Available colours for render
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 
 class pong_class(object):
-    def __init__(self, width, height, ball_radius, pad_width, pad_height, num_of_users):
+    def __init__(self, width=600, height=600, ball_radius=20, pad_width=10, pad_height=100, num_of_users=2):
         '''Will initialize the game with specific parameters for use within the algorithm.
         @param width: An integer for the width of the game in pixels.
         @param height: An integer for the height of the game in pixels.
@@ -63,8 +62,9 @@ class pong_class(object):
             self.paddle_pos[1] = [self.WIDTH + 1 - self.HALF_PAD_WIDTH, self.HEIGHT/2]
             if(self.num_of_users > 2):
                 self.paddle_pos[2] = [self.WIDTH/2, self.HALF_PAD_WIDTH - 1]
-                if(self.num_of_user == 4):
+                if(self.num_of_users == 4):
                     self.paddle_pos[3] = [self.WIDTH/2, self.HEIGHT + 1 - self.HALF_PAD_WIDTH]
+        print(self.paddle_pos)
         self.spawn_ball(random.randrange(0,4))
 
     def spawn_ball(self, side):
@@ -97,7 +97,7 @@ class pong_class(object):
         '''
         counter = 0
         for paddle_i in self.paddle_pos:
-            if(counter > self.num_of_users):
+            if(counter + 1 > self.num_of_users):
                 break
             if(counter < 2): # for users 1 & 2
                 if ((paddle_i[1] > self.HALF_PAD_HEIGHT) and (paddle_i[1] < self.HEIGHT - self.HALF_PAD_HEIGHT)):
@@ -130,10 +130,10 @@ class pong_class(object):
                     else:
                         paddle_i[0] = self.HALF_PAD_HEIGHT
                 pygame.draw.polygon(self.canvas, GREEN, 
-                    [[paddle_i[1] - self.HALF_PAD_WIDTH, paddle_i[0] - self.HALF_PAD_HEIGHT], 
-                    [paddle_i[1] - self.HALF_PAD_WIDTH, paddle_i[0] + self.HALF_PAD_HEIGHT], 
-                    [paddle_i[1] + self.HALF_PAD_WIDTH, paddle_i[0] + self.HALF_PAD_HEIGHT], 
-                    [paddle_i[1] + self.HALF_PAD_WIDTH, paddle_i[0] - self.HALF_PAD_HEIGHT]], 
+                    [[paddle_i[0] - self.HALF_PAD_HEIGHT, paddle_i[1] - self.HALF_PAD_WIDTH], 
+                    [paddle_i[0] - self.HALF_PAD_HEIGHT, paddle_i[1] + self.HALF_PAD_WIDTH], 
+                    [paddle_i[0] + self.HALF_PAD_HEIGHT, paddle_i[1] + self.HALF_PAD_WIDTH], 
+                    [paddle_i[0] + self.HALF_PAD_HEIGHT, paddle_i[1] - self.HALF_PAD_WIDTH]], 
                     0)
             counter += 1
 
@@ -142,18 +142,18 @@ class pong_class(object):
         the number participants in the game.
         '''
         system_font = pygame.font.SysFont("Comic Sans MS", 20) # Hope you guys like it ;)
-        label_user1 = system_font.render("User 1 Score " + str(self.scores[0]))
-        label_user2 = system_font.render("User 2 Score " + str(self.scores[1]))
-        label_user3 = system_font.render("User 3 Score " + str(self.scores[2]))
-        label_user4 = system_font.render("User 4 Score " + str(self.scores[3]))
+        label_user1 = system_font.render("User 1 Score " + str(self.scores[0]), 1, (255, 255, 0))
+        label_user2 = system_font.render("User 2 Score " + str(self.scores[1]), 1, (255, 255, 0))
+        label_user3 = system_font.render("User 3 Score " + str(self.scores[2]), 1, (255, 255, 0))
+        label_user4 = system_font.render("User 4 Score " + str(self.scores[3]), 1, (255, 255, 0))
         # Draw the scores on the board
         self.canvas.blit(label_user1, (2*self.PAD_WIDTH, self.HEIGHT/2))    
         if(self.num_of_users > 1):
-            self.canvas.blit(label_user2, (self.WIDTH - 2*self.PAD_WIDTH, self.HEIGHT/2))
+            self.canvas.blit(label_user2, (self.WIDTH - 11*self.PAD_WIDTH, self.HEIGHT/2))
             if(self.num_of_users > 2):
-                self.canvas.blit(label_user3, (self.WIDTH/2, 2*self.PAD_WIDTH))
+                self.canvas.blit(label_user3, (self.WIDTH/2 - 4*self.PAD_WIDTH, 2*self.PAD_WIDTH))
                 if(self.num_of_users > 3):
-                    self.canvas.blit(label_user4, (self.WIDTH/2, self.HEIGHT - 2*self.PAD_WIDTH))
+                    self.canvas.blit(label_user4, (self.WIDTH/2 - 4*self.PAD_WIDTH, self.HEIGHT - 3*self.PAD_WIDTH))
 
     def determine_walls(self):
         '''Will determine which walls the ball will bounce off of.
@@ -165,7 +165,7 @@ class pong_class(object):
             if(int(self.ball_pos[1] >= self.HEIGHT + 1 - self.BALL_RADIUS)): # Bottom wall
                 self.ball_vel[1] = -1 * self.ball_vel[1]
             if(self.num_of_users < 3):
-                if(int(self.ball_pos[1] <= BALL_RADIUS)): # Top wall
+                if(int(self.ball_pos[1] <= self.BALL_RADIUS)): # Top wall
                     self.ball_vel[1] = -1 * self.ball_vel[1]
                 if(self.num_of_users < 2):
                     if((int(self.ball_pos[0] >= self.WIDTH + 1 - self.BALL_RADIUS))): # Right wall
@@ -180,7 +180,7 @@ class pong_class(object):
             self.ball_vel[0] = -1.1 * self.ball_vel[0] # slightly increase the difficulty by 10%
             self.ball_vel[1] *= 1.1
         elif(int(self.ball_pos[0]) <= self.BALL_RADIUS + self.PAD_WIDTH):
-            self.score[0] += -1 
+            self.scores[0] += -1 
             self.spawn_ball(3)
         if(self.num_of_users > 1):
             # Right side
@@ -188,7 +188,7 @@ class pong_class(object):
                 self.ball_vel[0] = -1.1 * self.ball_vel[0]
                 self.ball_vel[1] *= 1.1
             elif(int(self.ball_pos[0]) >= self.WIDTH + 1 - self.BALL_RADIUS - self.PAD_WIDTH):
-                self.score[1] += -1
+                self.scores[1] += -1
                 self.spawn_ball(2)
             if(self.num_of_users > 2):
                 # Top side 
@@ -196,7 +196,7 @@ class pong_class(object):
                     self.ball_vel[1] = -1.1 * self.ball_vel[1]
                     self.ball_vel[0] *= 1.1
                 elif(int(self.ball_pos[1]) <= self.BALL_RADIUS + self.PAD_WIDTH):
-                    self.score[2] += -1
+                    self.scores[2] += -1
                     self.spawn_ball(0)
                 if(self.num_of_users > 3):
                     # Bottom side
@@ -204,7 +204,7 @@ class pong_class(object):
                         self.ball_vel[1] = -1.1 * self.ball_vel[1]
                         self.ball_vel[0] *= 1.1
                     elif(int(self.ball_pos[1]) >= self.HEIGHT + 1 - self.BALL_RADIUS - self.PAD_WIDTH):
-                        self.score[3] += -1
+                        self.scores[3] += -1
                         self.spawn_ball(1)
 
     def gameplay(self):
