@@ -15,7 +15,6 @@ BLACK = (0, 0, 0)
 YELLOW = (255, 255, 0)
 
 def threaded_client(conn, player, current_player):
-    # Will need to figure out what to send for player
     conn.send(pickle.dumps([players[player], ball_vel]))
     reply = ''
     while(True):
@@ -34,13 +33,16 @@ def threaded_client(conn, player, current_player):
                     reply = [players[0], players[2], players[3], ball_vel]
                 elif(player == 2): # user3 
                     reply = [players[0], players[1], players[3], ball_vel]
-                else: # user4
+                elif(player == 3): # user4
                     reply = [players[0], players[1], players[2], ball_vel]
+                else:
+                    reply = '' # Will prevent a 5th player from joining the game
                 print("Received from Player", player, ":", data)
                 print("Sending to Player", player, ':', reply)
             conn.sendall(pickle.dumps(reply))
         except:
             break
+    players[player] = default_players[player] # resets the player for the rest
     current_player = player - 1
     print("Lost Connection to Client: ", player + 1)
     conn.close()
@@ -61,7 +63,7 @@ print("Waiting for connection of client. Server has been started.")
 # Each array is broken up as [user_num, paddle position, connected]
 ball_vel = [random.randrange(2,4), random.randrange(1,3)]
 players = [[1, [4, 300], 0], [2, [596, 300], 0], [3, [300, 4], 0], [4, [300, 596], 0]]
-
+default_players = [[1, [4, 300], 0], [2, [596, 300], 0], [3, [300, 4], 0], [4, [300, 596], 0]]
 
 current_player = 0
 total = []
@@ -69,30 +71,6 @@ lst = []
 while(True):
     conn, address = s.accept()
     print("Connected to:", address)
-    total.append(address)
-    lst.append(conn)
-    lst.append(address)
     ball_vel = [random.randrange(2,4), random.randrange(1,3)]
     start_new_thread(threaded_client, (conn, current_player, current_player))
     current_player += 1
-    # print(len(total))
-    # if(len(total) > 0):
-    #     conn1 = lst[0]
-    #     address1 = lst[1]
-    #     start_new_thread(threaded_client, (conn1, current_player))
-    #     current_player += 1
-    # if(len(total) > 1):
-    #     conn2 = lst[2]
-    #     address2 = lst[3]
-    #     start_new_thread(threaded_client, (conn2, current_player))
-    #     current_player += 1
-    # if(len(total) > 2):
-    #     conn3 = lst[4]
-    #     address3 = lst[5]
-    #     start_new_thread(threaded_client, (conn3, current_player))
-    #     current_player += 1
-    # if(len(total) > 3):
-    #     conn4 = lst[6]
-    #     address4 = lst[7]
-    #     start_new_thread(threaded_client, (conn4, current_player))
-    #     current_player += 1
