@@ -22,7 +22,6 @@ def threaded_client(conn, player):
             data = pickle.loads(conn.recv(2048))
             players[player][1] = data # The position of the player
             players[player][2] = 1
-            print(players[player])
             if not data:
                 print("Disconnected")
                 break
@@ -75,5 +74,5 @@ while(True):
     ball_vel = [random.randrange(2,4), random.randrange(1,3)]
     start_new_thread(threaded_client, (conn, current_player))
     connected_players[current_player] = 1
-    # print(connected_players)
+    print(connected_players)
     current_player += 1
