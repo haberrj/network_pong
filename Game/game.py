@@ -79,9 +79,9 @@ def draw_game(canvas):
     global paddle1_pos, paddle2_pos, ball_pos, ball_vel, l_score, r_score
 
     canvas.fill(BLACK)
-    pygame.draw.line(canvas, WHITE, [WIDTH/2, 0], [WIDTH/2, HEIGHT], 1)
-    pygame.draw.line(canvas, WHITE, [PAD_WIDTH, 0],[PAD_WIDTH, HEIGHT], 1)
-    pygame.draw.line(canvas, WHITE, [WIDTH - PAD_WIDTH, 0],[WIDTH - PAD_WIDTH, HEIGHT], 1)
+    pygame.draw.line(canvas, WHITE, [WIDTH/2, 0], [WIDTH/2, HEIGHT], 1) # middle
+    pygame.draw.line(canvas, WHITE, [PAD_WIDTH, 0],[PAD_WIDTH, HEIGHT], 1) # left side
+    pygame.draw.line(canvas, WHITE, [WIDTH - PAD_WIDTH, 0],[WIDTH - PAD_WIDTH, HEIGHT], 1) # right side
     pygame.draw.circle(canvas, WHITE, [WIDTH//2, HEIGHT//2], 70, 1)
 
     # Updates the paddle's vertical position and keeps the paddle on the screen
@@ -128,34 +128,21 @@ def draw_game(canvas):
 
     # Check the ball collisions on the gutters and user paddles
     # Make a function to do this for every side
-    try:
-        if(int(ball_pos[0]) <= BALL_RADIUS + PAD_WIDTH) and (int(ball_pos[1]) in range(int(paddle1_pos[1]) - int(HALF_PAD_HEIGHT),int(paddle1_pos[1]) + int(HALF_PAD_HEIGHT),1)):
-            ball_vel[0] = -ball_vel[0]
-            ball_vel[0] *= 1.1
-            ball_vel[1] *= 1.1
-        elif(int(ball_pos[0]) <= BALL_RADIUS + PAD_WIDTH):
-            r_score += 1
-            spawn_ball(2)
-    except TypeError:
-        print("Error in paddle 1")
-        print(int(ball_pos[0]))
-        print(ball_pos[1])
-        print(paddle1_pos[1])
-        sys.exit()
-    try:
-        if(int(ball_pos[0]) >= WIDTH + 1 - BALL_RADIUS - PAD_WIDTH) and (int(ball_pos[1]) in range(int(paddle2_pos[1]) - int(HALF_PAD_HEIGHT),int(paddle2_pos[1]) + int(HALF_PAD_HEIGHT),1)):
-            ball_vel[0] = -ball_vel[0]
-            ball_vel[0] *= 1.1
-            ball_vel[1] *= 1.1
-        elif int(ball_pos[0]) >= WIDTH + 1 - BALL_RADIUS - PAD_WIDTH:
-            l_score += 1
-            spawn_ball(3)
-    except TypeError:
-        print("Error in paddle 2")
-        print(int(ball_pos[0]))
-        print(ball_pos[1])
-        print(paddle2_pos[1])
-        sys.exit()
+    if(int(ball_pos[0]) <= BALL_RADIUS + PAD_WIDTH) and (int(ball_pos[1]) in range(int(paddle1_pos[1]) - int(HALF_PAD_HEIGHT),int(paddle1_pos[1]) + int(HALF_PAD_HEIGHT),1)):
+        ball_vel[0] = -ball_vel[0]
+        ball_vel[0] *= 1.1
+        ball_vel[1] *= 1.1
+    elif(int(ball_pos[0]) <= BALL_RADIUS + PAD_WIDTH):
+        r_score += 1
+        spawn_ball(2)
+
+    if(int(ball_pos[0]) >= WIDTH + 1 - BALL_RADIUS - PAD_WIDTH) and (int(ball_pos[1]) in range(int(paddle2_pos[1]) - int(HALF_PAD_HEIGHT),int(paddle2_pos[1]) + int(HALF_PAD_HEIGHT),1)):
+        ball_vel[0] = -ball_vel[0]
+        ball_vel[0] *= 1.1
+        ball_vel[1] *= 1.1
+    elif int(ball_pos[0]) >= WIDTH + 1 - BALL_RADIUS - PAD_WIDTH:
+        l_score += 1
+        spawn_ball(3)
     
     # Update the scores
     game_font1 = pygame.font.SysFont("Comic Sans MS", 20) # def not Comic Sans
