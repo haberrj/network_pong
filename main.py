@@ -58,7 +58,6 @@ def main():
     
     while(running):
         current_other_users = n.send(data)
-        print(current_other_users)
         try:
             new_num_users = current_other_users[0][2] + current_other_users[1][2] + current_other_users[2][2] + 1
         except IndexError as e:
@@ -75,10 +74,8 @@ def main():
         pygame.draw.circle(game.canvas, WHITE, [game.WIDTH//2, game.HEIGHT//2], 70, 1)
         sorting_data = [current_other_users[0], current_other_users[1], current_other_users[2], [my_user, my_paddle_pos]]
         user1, user2, user3, user4 = OrderUsers(sorting_data)
-        # print("Ball velocity", ball_vel)
         game.game_setup(user1, user2, user3, user4)
         game.gameplay(ball_vel)
-        print(my_user)
         for event in pygame.event.get():
             if(event.type == KEYDOWN):
                 game.key_down(event, my_user)
@@ -88,8 +85,8 @@ def main():
                 pygame.quit()
                 sys.exit()
         my_paddle_pos = game.paddle_pos[my_user + 1]
+        # print(my_paddle_pos)
         data = my_paddle_pos
-        print(data)
         pygame.display.flip()
         pygame.display.update()
         game.fps.tick(60)

@@ -18,7 +18,7 @@ class Network:
         self.server_ip = server_ip
         self.port_num = server_port
         self.address = (self.server_ip, self.port_num)
-        print("Connecting")
+        print("Connecting...")
         self.p = self.connect()
 
     def connect(self):

@@ -47,7 +47,7 @@ class pong_class(object):
         # Setting values for multiple paddles regardless of users
         self.paddle_vel = [0, 0, 0, 0]
         # Setting the paddle positions
-        self.paddle_pos = [[0,0], [0,0], [0,0], [0,0]] # 1 is left, 2 is right, 3 is up, 4 is down
+        self.paddle_pos = [[4,0], [596,0], [0,4], [0,596]] # 1 is left, 2 is right, 3 is up, 4 is down
         # need to come up with a scoring system. It might be out of scope due to time restrictions so for now scores will be negative (i.e. loser based)
         self.scores = [0, 0, 0, 0] # Even if the last 2 values are not required it doesn't use much memory
         # Drawing elements
@@ -101,6 +101,7 @@ class pong_class(object):
                         paddle_i[1] = self.HEIGHT - self.HALF_PAD_HEIGHT
                     else:
                         paddle_i[1] = self.HALF_PAD_HEIGHT
+                # print(paddle_i)
                 pygame.draw.polygon(self.canvas, GREEN, 
                     [[paddle_i[0] - self.HALF_PAD_WIDTH, paddle_i[1] - self.HALF_PAD_HEIGHT], 
                     [paddle_i[0] - self.HALF_PAD_WIDTH, paddle_i[1] + self.HALF_PAD_HEIGHT], 

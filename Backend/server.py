@@ -14,7 +14,7 @@ GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 YELLOW = (255, 255, 0)
 
-def threaded_client(conn, player):
+def threaded_client(conn, player, current_player):
     # Will need to figure out what to send for player
     conn.send(pickle.dumps([players[player], ball_vel]))
     reply = ''
@@ -23,6 +23,7 @@ def threaded_client(conn, player):
             data = pickle.loads(conn.recv(2048))
             players[player][1] = data # The position of the player
             players[player][2] = 1
+            print(players[player])
             if not data:
                 print("Disconnected")
                 break
@@ -40,7 +41,8 @@ def threaded_client(conn, player):
             conn.sendall(pickle.dumps(reply))
         except:
             break
-    print("Lost Connection")
+    current_player = player - 1
+    print("Lost Connection to Client: ", player + 1)
     conn.close()
 
 server = '195.90.200.226' # I have a VPS and this is the IP address for it
@@ -71,7 +73,7 @@ while(True):
     lst.append(conn)
     lst.append(address)
     ball_vel = [random.randrange(2,4), random.randrange(1,3)]
-    start_new_thread(threaded_client, (conn, current_player))
+    start_new_thread(threaded_client, (conn, current_player, current_player))
     current_player += 1
     # print(len(total))
     # if(len(total) > 0):
