@@ -42,7 +42,6 @@ def threaded_client(conn, player):
         except:
             break
     players[player] = default_players[player] # resets the player for the rest
-    connected_players[player] = 0
     print("Lost Connection to Client: ", player + 1)
     conn.close()
 
