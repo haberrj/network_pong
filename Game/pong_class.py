@@ -41,13 +41,15 @@ class pong_class(object):
             raise ValueError("num_of_users must be an integer between 1 and 4.")
         else:
             self.num_of_users = num_of_users
+        # Setting the availability of the paddles based on the user
+        self.paddle_availability = [0, 0, 0, 0]
         # Other needed class values
         self.ball_pos = [0,0]
         self.ball_vel = [0,0]
         # Setting values for multiple paddles regardless of users
         self.paddle_vel = [0, 0, 0, 0]
         # Setting the paddle positions
-        self.paddle_pos = [[4,0], [596,0], [0,4], [0,596]] # 1 is left, 2 is right, 3 is up, 4 is down
+        self.paddle_pos = [[0,0], [0,0], [0,0], [0,0]] # 1 is left, 2 is right, 3 is up, 4 is down
         # need to come up with a scoring system. It might be out of scope due to time restrictions so for now scores will be negative (i.e. loser based)
         self.scores = [0, 0, 0, 0] # Even if the last 2 values are not required it doesn't use much memory
         # Drawing elements
@@ -66,12 +68,9 @@ class pong_class(object):
         @param ball_vel: A list with the x and y velocities of the ball to be initialized
         '''
         self.paddle_pos[0] = user1 # Paddle 1 will always be initialized
-        if(self.num_of_users > 1): # Cascading if statements since as the number is increased all other users are required
-            self.paddle_pos[1] = user2
-            if(self.num_of_users > 2):
-                self.paddle_pos[2] = user3
-                if(self.num_of_users == 4):
-                    self.paddle_pos[3] = user4
+        self.paddle_pos[1] = user2
+        self.paddle_pos[2] = user3
+        self.paddle_pos[3] = user4
     
     def spawn_ball(self, ball_vel):
         '''Will spawn the ball based on the position received from the server.
@@ -85,48 +84,120 @@ class pong_class(object):
         There is a difference between users 1 & 2 and users 3 & 4 since due to the nature of moving horizontally
         or vertically.
         '''
-        counter = 0
-        for paddle_i in self.paddle_pos:
-            if(counter + 1 > self.num_of_users):
-                break
-            if(counter < 2): # for users 1 & 2
-                if ((paddle_i[1] > self.HALF_PAD_HEIGHT) and (paddle_i[1] < self.HEIGHT - self.HALF_PAD_HEIGHT)):
-                    paddle_i[1] += self.paddle_vel[counter]
-                elif ((paddle_i[1] == self.HALF_PAD_HEIGHT) and (self.paddle_vel[counter] > 0)):
-                    paddle_i[1] += self.paddle_vel[counter]
-                elif ((paddle_i[1] == self.HEIGHT - self.HALF_PAD_HEIGHT) and (self.paddle_vel[counter] < 0)):
-                    paddle_i[1] += self.paddle_vel[counter]
-                else: # Stops the paddle from getting stuck at the bottom
-                    if(paddle_i[1] > self.HEIGHT/2):
-                        paddle_i[1] = self.HEIGHT - self.HALF_PAD_HEIGHT
-                    else:
-                        paddle_i[1] = self.HALF_PAD_HEIGHT
-                # print(paddle_i)
-                pygame.draw.polygon(self.canvas, GREEN, 
-                    [[paddle_i[0] - self.HALF_PAD_WIDTH, paddle_i[1] - self.HALF_PAD_HEIGHT], 
-                    [paddle_i[0] - self.HALF_PAD_WIDTH, paddle_i[1] + self.HALF_PAD_HEIGHT], 
-                    [paddle_i[0] + self.HALF_PAD_WIDTH, paddle_i[1] + self.HALF_PAD_HEIGHT], 
-                    [paddle_i[0] + self.HALF_PAD_WIDTH, paddle_i[1] - self.HALF_PAD_HEIGHT]], 
-                    0)
-            else: # for users 3 & 4
-                if ((paddle_i[0] > self.HALF_PAD_HEIGHT) and (paddle_i[0] < self.WIDTH - self.HALF_PAD_HEIGHT)):
-                    paddle_i[0] += self.paddle_vel[counter]
-                elif ((paddle_i[0] == self.HALF_PAD_HEIGHT) and (self.paddle_vel[counter] > 0)):
-                    paddle_i[0] += self.paddle_vel[counter]
-                elif ((paddle_i[0] == self.WIDTH - self.HALF_PAD_HEIGHT) and (self.paddle_vel[counter] < 0)):
-                    paddle_i[0] += self.paddle_vel[counter]
-                else: # Stops the paddle from getting stuck at the bottom
-                    if(paddle_i[0] > self.WIDTH/2):
-                        paddle_i[0] = self.WIDTH - self.HALF_PAD_HEIGHT
-                    else:
-                        paddle_i[0] = self.HALF_PAD_HEIGHT
-                pygame.draw.polygon(self.canvas, GREEN, 
-                    [[paddle_i[0] - self.HALF_PAD_HEIGHT, paddle_i[1] - self.HALF_PAD_WIDTH], 
-                    [paddle_i[0] - self.HALF_PAD_HEIGHT, paddle_i[1] + self.HALF_PAD_WIDTH], 
-                    [paddle_i[0] + self.HALF_PAD_HEIGHT, paddle_i[1] + self.HALF_PAD_WIDTH], 
-                    [paddle_i[0] + self.HALF_PAD_HEIGHT, paddle_i[1] - self.HALF_PAD_WIDTH]], 
-                    0)
-            counter += 1
+        if(self.paddle_availability[0] == 1): # user 1
+            if ((self.paddle_pos[0][1] > self.HALF_PAD_HEIGHT) and (self.paddle_pos[0][1] < self.HEIGHT - self.HALF_PAD_HEIGHT)):
+                self.paddle_pos[0][1] += self.paddle_vel[0]
+            elif ((self.paddle_pos[0][1] == self.HALF_PAD_HEIGHT) and (self.paddle_vel[0] > 0)):
+                self.paddle_pos[0][1] += self.paddle_vel[0]
+            elif ((self.paddle_pos[0][1] == self.HEIGHT - self.HALF_PAD_HEIGHT) and (self.paddle_vel[0] < 0)):
+                self.paddle_pos[0][1] += self.paddle_vel[0]
+            else: # Stops the paddle from getting stuck at the bottom
+                if(self.paddle_pos[0][1] > self.HEIGHT/2):
+                    self.paddle_pos[0][1] = self.HEIGHT - self.HALF_PAD_HEIGHT
+                else:
+                    self.paddle_pos[0][1] = self.HALF_PAD_HEIGHT
+            pygame.draw.polygon(self.canvas, GREEN, 
+                [[self.paddle_pos[0][0] - self.HALF_PAD_WIDTH, self.paddle_pos[0][1] - self.HALF_PAD_HEIGHT], 
+                [self.paddle_pos[0][0] - self.HALF_PAD_WIDTH, self.paddle_pos[0][1] + self.HALF_PAD_HEIGHT], 
+                [self.paddle_pos[0][0] + self.HALF_PAD_WIDTH, self.paddle_pos[0][1] + self.HALF_PAD_HEIGHT], 
+                [self.paddle_pos[0][0] + self.HALF_PAD_WIDTH, self.paddle_pos[0][1] - self.HALF_PAD_HEIGHT]], 
+                0)
+        if(self.paddle_availability[1] == 1): # user 2
+            if ((self.paddle_pos[1][1] > self.HALF_PAD_HEIGHT) and (self.paddle_pos[1][1] < self.HEIGHT - self.HALF_PAD_HEIGHT)):
+                self.paddle_pos[1][1] += self.paddle_vel[1]
+            elif ((self.paddle_pos[1][1] == self.HALF_PAD_HEIGHT) and (self.paddle_vel[1] > 0)):
+                self.paddle_pos[1][1] += self.paddle_vel[1]
+            elif ((self.paddle_pos[1][1] == self.HEIGHT - self.HALF_PAD_HEIGHT) and (self.paddle_vel[1] < 0)):
+                self.paddle_pos[1][1] += self.paddle_vel[1]
+            else: # Stops the paddle from getting stuck at the bottom
+                if(self.paddle_pos[1][1] > self.HEIGHT/2):
+                    self.paddle_pos[1][1] = self.HEIGHT - self.HALF_PAD_HEIGHT
+                else:
+                    self.paddle_pos[1][1] = self.HALF_PAD_HEIGHT
+            pygame.draw.polygon(self.canvas, GREEN, 
+                [[self.paddle_pos[1][0] - self.HALF_PAD_WIDTH, self.paddle_pos[1][1] - self.HALF_PAD_HEIGHT], 
+                [self.paddle_pos[1][0] - self.HALF_PAD_WIDTH, self.paddle_pos[1][1] + self.HALF_PAD_HEIGHT], 
+                [self.paddle_pos[1][0] + self.HALF_PAD_WIDTH, self.paddle_pos[1][1] + self.HALF_PAD_HEIGHT], 
+                [self.paddle_pos[1][0] + self.HALF_PAD_WIDTH, self.paddle_pos[1][1] - self.HALF_PAD_HEIGHT]], 
+                0)
+        if(self.paddle_availability[2] == 1): # user 3
+            if ((self.paddle_pos[2][0] > self.HALF_PAD_HEIGHT) and (self.paddle_pos[2][0] < self.WIDTH - self.HALF_PAD_HEIGHT)):
+                self.paddle_pos[2][0] += self.paddle_vel[2]
+            elif ((self.paddle_pos[2][0] == self.HALF_PAD_HEIGHT) and (self.paddle_vel[2] > 0)):
+                self.paddle_pos[2][0] += self.paddle_vel[2]
+            elif ((self.paddle_pos[2][0] == self.WIDTH - self.HALF_PAD_HEIGHT) and (self.paddle_vel[2] < 0)):
+                self.paddle_pos[2][0] += self.paddle_vel[2]
+            else: # Stops the paddle from getting stuck at the bottom
+                if(self.paddle_pos[2][0] > self.WIDTH/2):
+                    self.paddle_pos[2][0] = self.WIDTH - self.HALF_PAD_HEIGHT
+                else:
+                    self.paddle_pos[2][0] = self.HALF_PAD_HEIGHT
+            pygame.draw.polygon(self.canvas, GREEN, 
+                [[self.paddle_pos[2][0] - self.HALF_PAD_HEIGHT, self.paddle_pos[2][1] - self.HALF_PAD_WIDTH], 
+                [self.paddle_pos[2][0] - self.HALF_PAD_HEIGHT, self.paddle_pos[2][1] + self.HALF_PAD_WIDTH], 
+                [self.paddle_pos[2][0] + self.HALF_PAD_HEIGHT, self.paddle_pos[2][1] + self.HALF_PAD_WIDTH], 
+                [self.paddle_pos[2][0] + self.HALF_PAD_HEIGHT, self.paddle_pos[2][1] - self.HALF_PAD_WIDTH]], 
+                0)
+        if(self.paddle_availability[3] == 1): # user 4
+            if ((self.paddle_pos[3][0] > self.HALF_PAD_HEIGHT) and (self.paddle_pos[3][0] < self.WIDTH - self.HALF_PAD_HEIGHT)):
+                self.paddle_pos[3][0] += self.paddle_vel[3]
+            elif ((self.paddle_pos[3][0] == self.HALF_PAD_HEIGHT) and (self.paddle_vel[3] > 0)):
+                self.paddle_pos[3][0] += self.paddle_vel[3]
+            elif ((self.paddle_pos[3][0] == self.WIDTH - self.HALF_PAD_HEIGHT) and (self.paddle_vel[3] < 0)):
+                self.paddle_pos[3][0] += self.paddle_vel[3]
+            else: # Stops the paddle from getting stuck at the bottom
+                if(self.paddle_pos[3][0] > self.WIDTH/2):
+                    self.paddle_pos[3][0] = self.WIDTH - self.HALF_PAD_HEIGHT
+                else:
+                    self.paddle_pos[3][0] = self.HALF_PAD_HEIGHT
+            pygame.draw.polygon(self.canvas, GREEN, 
+                [[self.paddle_pos[3][0] - self.HALF_PAD_HEIGHT, self.paddle_pos[3][1] - self.HALF_PAD_WIDTH], 
+                [self.paddle_pos[3][0] - self.HALF_PAD_HEIGHT, self.paddle_pos[3][1] + self.HALF_PAD_WIDTH], 
+                [self.paddle_pos[3][0] + self.HALF_PAD_HEIGHT, self.paddle_pos[3][1] + self.HALF_PAD_WIDTH], 
+                [self.paddle_pos[3][0] + self.HALF_PAD_HEIGHT, self.paddle_pos[3][1] - self.HALF_PAD_WIDTH]], 
+                0)
+        # counter = 0
+        # for i in len(self.paddle_pos):
+        #     if(counter + 1 > self.num_of_users):
+        #         break
+        #     if(counter < 2): # for users 1 & 2
+        #         if ((self.paddle_pos[i][1] > self.HALF_PAD_HEIGHT) and (self.paddle_pos[i][1] < self.HEIGHT - self.HALF_PAD_HEIGHT)):
+        #             self.paddle_pos[i][1] += self.paddle_vel[counter]
+        #         elif ((self.paddle_pos[i][1] == self.HALF_PAD_HEIGHT) and (self.paddle_vel[counter] > 0)):
+        #             self.paddle_pos[i][1] += self.paddle_vel[counter]
+        #         elif ((self.paddle_pos[i][1] == self.HEIGHT - self.HALF_PAD_HEIGHT) and (self.paddle_vel[counter] < 0)):
+        #             self.paddle_pos[i][1] += self.paddle_vel[counter]
+        #         else: # Stops the paddle from getting stuck at the bottom
+        #             if(self.paddle_pos[i][1] > self.HEIGHT/2):
+        #                 self.paddle_pos[i][1] = self.HEIGHT - self.HALF_PAD_HEIGHT
+        #             else:
+        #                 self.paddle_pos[i][1] = self.HALF_PAD_HEIGHT
+        #         # print(self.paddle_pos[i])
+        #         pygame.draw.polygon(self.canvas, GREEN, 
+        #             [[self.paddle_pos[i][0] - self.HALF_PAD_WIDTH, self.paddle_pos[i][1] - self.HALF_PAD_HEIGHT], 
+        #             [self.paddle_pos[i][0] - self.HALF_PAD_WIDTH, self.paddle_pos[i][1] + self.HALF_PAD_HEIGHT], 
+        #             [self.paddle_pos[i][0] + self.HALF_PAD_WIDTH, self.paddle_pos[i][1] + self.HALF_PAD_HEIGHT], 
+        #             [self.paddle_pos[i][0] + self.HALF_PAD_WIDTH, self.paddle_pos[i][1] - self.HALF_PAD_HEIGHT]], 
+        #             0)
+        #     else: # for users 3 & 4
+        #         if ((self.paddle_pos[i][0] > self.HALF_PAD_HEIGHT) and (self.paddle_pos[i][0] < self.WIDTH - self.HALF_PAD_HEIGHT)):
+        #             self.paddle_pos[i][0] += self.paddle_vel[counter]
+        #         elif ((self.paddle_pos[i][0] == self.HALF_PAD_HEIGHT) and (self.paddle_vel[counter] > 0)):
+        #             self.paddle_pos[i][0] += self.paddle_vel[counter]
+        #         elif ((self.paddle_pos[i][0] == self.WIDTH - self.HALF_PAD_HEIGHT) and (self.paddle_vel[counter] < 0)):
+        #             self.paddle_pos[i][0] += self.paddle_vel[counter]
+        #         else: # Stops the paddle from getting stuck at the bottom
+        #             if(self.paddle_pos[i][0] > self.WIDTH/2):
+        #                 self.paddle_pos[i][0] = self.WIDTH - self.HALF_PAD_HEIGHT
+        #             else:
+        #                 self.paddle_pos[i][0] = self.HALF_PAD_HEIGHT
+        #         pygame.draw.polygon(self.canvas, GREEN, 
+        #             [[self.paddle_pos[i][0] - self.HALF_PAD_HEIGHT, self.paddle_pos[i][1] - self.HALF_PAD_WIDTH], 
+        #             [self.paddle_pos[i][0] - self.HALF_PAD_HEIGHT, self.paddle_pos[i][1] + self.HALF_PAD_WIDTH], 
+        #             [self.paddle_pos[i][0] + self.HALF_PAD_HEIGHT, self.paddle_pos[i][1] + self.HALF_PAD_WIDTH], 
+        #             [self.paddle_pos[i][0] + self.HALF_PAD_HEIGHT, self.paddle_pos[i][1] - self.HALF_PAD_WIDTH]], 
+        #             0)
+        #     counter += 1
 
     def update_scores(self):
         '''Will update the score variables and draw the scores on the field based on
@@ -138,43 +209,45 @@ class pong_class(object):
         label_user3 = system_font.render("User 3 Score " + str(self.scores[2]), 1, YELLOW)
         label_user4 = system_font.render("User 4 Score " + str(self.scores[3]), 1, YELLOW)
         # Draw the scores on the board
-        self.canvas.blit(label_user1, (2*self.PAD_WIDTH, self.HEIGHT/2))    
-        if(self.num_of_users > 1):
+        if(self.paddle_availability[0] == 1):
+            self.canvas.blit(label_user1, (2*self.PAD_WIDTH, self.HEIGHT/2))    
+        if(self.paddle_availability[1] == 1):
             self.canvas.blit(label_user2, (self.WIDTH - 11*self.PAD_WIDTH, self.HEIGHT/2))
-            if(self.num_of_users > 2):
-                self.canvas.blit(label_user3, (self.WIDTH/2 - 4*self.PAD_WIDTH, 2*self.PAD_WIDTH))
-                if(self.num_of_users > 3):
-                    self.canvas.blit(label_user4, (self.WIDTH/2 - 4*self.PAD_WIDTH, self.HEIGHT - 3*self.PAD_WIDTH))
+        if(self.paddle_availability[2] == 1):
+            self.canvas.blit(label_user3, (self.WIDTH/2 - 4*self.PAD_WIDTH, 2*self.PAD_WIDTH))
+        if(self.paddle_availability[3] == 1):
+            self.canvas.blit(label_user4, (self.WIDTH/2 - 4*self.PAD_WIDTH, self.HEIGHT - 3*self.PAD_WIDTH))
 
     def determine_walls(self):
         '''Will determine which walls the ball will bounce off of.
         '''
-        # Check if less than 4 players, since with 4 players theres no walls
-        if(self.num_of_users == 4):
-            return
-        elif(self.num_of_users < 4):
+        if(self.paddle_availability[3] == 0): # user 4 not available
             if(int(self.ball_pos[1] >= self.HEIGHT + 1 - self.BALL_RADIUS)): # Bottom wall
                 self.ball_vel[1] = -1 * self.ball_vel[1]
-            if(self.num_of_users < 3):
-                if(int(self.ball_pos[1] <= self.BALL_RADIUS)): # Top wall
-                    self.ball_vel[1] = -1 * self.ball_vel[1]
-                if(self.num_of_users < 2):
-                    if((int(self.ball_pos[0] >= self.WIDTH + 1 - self.BALL_RADIUS))): # Right wall
-                        self.ball_vel[0] = -1 * self.ball_vel[0]
+        if(self.paddle_availability[2] == 0): # user 3 not available
+            if(int(self.ball_pos[1] <= self.BALL_RADIUS)): # Top wall
+                self.ball_vel[1] = -1 * self.ball_vel[1]
+        if(self.paddle_availability[1] == 0): # user 2 not available
+            if((int(self.ball_pos[0] >= self.WIDTH + 1 - self.BALL_RADIUS))): # Right wall
+                self.ball_vel[0] = -1 * self.ball_vel[0]
+        if(self.paddle_availability[0] == 0): # user 1 not available
+            if(int(self.ball_pos[0] <= self.BALL_RADIUS)): # Left wall
+                self.ball_vel[0] = -1 * self.ball_vel[0]
 
     def determine_paddles(self, ball_vel):
         '''Will determine which walls have paddles and which score.
         @param ball_vel: A list containing the velocities of the ball.
         '''
         # Left side
-        if((int(self.ball_pos[0]) <= self.BALL_RADIUS + self.PAD_WIDTH) and (int(self.ball_pos[1]) in range(int(self.paddle_pos[0][1]) - int(self.HALF_PAD_HEIGHT), int(self.paddle_pos[0][1]) + int(self.HALF_PAD_HEIGHT),1))):
-            # Checking if the ball is within the area where the paddle is
-            self.ball_vel[0] = -1.1 * self.ball_vel[0] # slightly increase the difficulty by 10%
-            self.ball_vel[1] *= 1.1
-        elif(int(self.ball_pos[0]) <= self.BALL_RADIUS + self.PAD_WIDTH):
-            self.scores[0] += -1 
-            self.spawn_ball(ball_vel)
-        if(self.num_of_users > 1):
+        if(self.paddle_availability[0] == 1): # user 1
+            if((int(self.ball_pos[0]) <= self.BALL_RADIUS + self.PAD_WIDTH) and (int(self.ball_pos[1]) in range(int(self.paddle_pos[0][1]) - int(self.HALF_PAD_HEIGHT), int(self.paddle_pos[0][1]) + int(self.HALF_PAD_HEIGHT),1))):
+                # Checking if the ball is within the area where the paddle is
+                self.ball_vel[0] = -1.1 * self.ball_vel[0] # slightly increase the difficulty by 10%
+                self.ball_vel[1] *= 1.1
+            elif(int(self.ball_pos[0]) <= self.BALL_RADIUS + self.PAD_WIDTH):
+                self.scores[0] += -1 
+                self.spawn_ball(ball_vel)
+        if(self.paddle_availability[1] == 1): # user 2
             # Right side
             if(int(self.ball_pos[0]) >= self.WIDTH + 1 - self.BALL_RADIUS - self.PAD_WIDTH) and (int(self.ball_pos[1]) in range(int(self.paddle_pos[1][1]) - int(self.HALF_PAD_HEIGHT),int(self.paddle_pos[1][1]) + int(self.HALF_PAD_HEIGHT),1)):
                 self.ball_vel[0] = -1.1 * self.ball_vel[0]
@@ -182,22 +255,22 @@ class pong_class(object):
             elif(int(self.ball_pos[0]) >= self.WIDTH + 1 - self.BALL_RADIUS - self.PAD_WIDTH):
                 self.scores[1] += -1
                 self.spawn_ball(ball_vel)
-            if(self.num_of_users > 2):
-                # Top side 
-                if((int(self.ball_pos[1]) <= self.BALL_RADIUS + self.PAD_WIDTH) and (int(self.ball_pos[0]) in range(int(self.paddle_pos[2][0]) - int(self.HALF_PAD_HEIGHT), int(self.paddle_pos[2][0]) + int(self.HALF_PAD_HEIGHT), 1))):
-                    self.ball_vel[1] = -1.1 * self.ball_vel[1]
-                    self.ball_vel[0] *= 1.1
-                elif(int(self.ball_pos[1]) <= self.BALL_RADIUS + self.PAD_WIDTH):
-                    self.scores[2] += -1
-                    self.spawn_ball(ball_vel)
-                if(self.num_of_users > 3):
-                    # Bottom side
-                    if((int(self.ball_pos[1]) >= self.HEIGHT + 1 - self.BALL_RADIUS - self.PAD_WIDTH) and (int(self.ball_pos[0]) in range(int(self.paddle_pos[3][0]) - int(self.HALF_PAD_HEIGHT), int(self.paddle_pos[3][0]) + int(self.HALF_PAD_HEIGHT), 1))):
-                        self.ball_vel[1] = -1.1 * self.ball_vel[1]
-                        self.ball_vel[0] *= 1.1
-                    elif(int(self.ball_pos[1]) >= self.HEIGHT + 1 - self.BALL_RADIUS - self.PAD_WIDTH):
-                        self.scores[3] += -1
-                        self.spawn_ball(ball_vel)
+        if(self.paddle_availability[2] == 1): # user 3
+            # Top side 
+            if((int(self.ball_pos[1]) <= self.BALL_RADIUS + self.PAD_WIDTH) and (int(self.ball_pos[0]) in range(int(self.paddle_pos[2][0]) - int(self.HALF_PAD_HEIGHT), int(self.paddle_pos[2][0]) + int(self.HALF_PAD_HEIGHT), 1))):
+                self.ball_vel[1] = -1.1 * self.ball_vel[1]
+                self.ball_vel[0] *= 1.1
+            elif(int(self.ball_pos[1]) <= self.BALL_RADIUS + self.PAD_WIDTH):
+                self.scores[2] += -1
+                self.spawn_ball(ball_vel)
+        if(self.paddle_availability[3] == 1): # user 4
+            # Bottom side
+            if((int(self.ball_pos[1]) >= self.HEIGHT + 1 - self.BALL_RADIUS - self.PAD_WIDTH) and (int(self.ball_pos[0]) in range(int(self.paddle_pos[3][0]) - int(self.HALF_PAD_HEIGHT), int(self.paddle_pos[3][0]) + int(self.HALF_PAD_HEIGHT), 1))):
+                self.ball_vel[1] = -1.1 * self.ball_vel[1]
+                self.ball_vel[0] *= 1.1
+            elif(int(self.ball_pos[1]) >= self.HEIGHT + 1 - self.BALL_RADIUS - self.PAD_WIDTH):
+                self.scores[3] += -1
+                self.spawn_ball(ball_vel)
 
     def gameplay(self, ball_vel):
         '''Will draw the game on the screen and execute the game itself.
@@ -248,3 +321,12 @@ class pong_class(object):
             self.paddle_vel[user-1] = 0
         elif(event.key in (K_LEFT, K_RIGHT)):
             self.paddle_vel[user-1] = 0
+
+    def active_users(self, user1, user2, user3, user4):
+        '''Will set each user as active or inactive.
+        @param active_users: A list of the users' activity value as delivered by the server.
+        '''
+        self.paddle_availability[0] = user1
+        self.paddle_availability[1] = user2
+        self.paddle_availability[2] = user3
+        self.paddle_availability[3] = user4

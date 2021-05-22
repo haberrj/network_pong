@@ -30,13 +30,17 @@ def OrderUsers(data):
     user4_pos = []
     for val in data:
         if(val[0] == 1):
-            user1_pos = val[1]
+            user1_pos[0] = val[1]
+            user1_pos[1] = val[2]
         elif(val[0] == 2):
-            user2_pos = val[1]
+            user2_pos[0] = val[1]
+            user2_pos[1] = val[2]
         elif(val[0] == 3):
-            user3_pos = val[1]
+            user3_pos[0] = val[1]
+            user3_pos[1] = val[2]
         else:
-            user4_pos = val[1]
+            user4_pos[0] = val[1]
+            user4_pos[1] = val[2]
     return user1_pos, user2_pos, user3_pos, user4_pos
 
 def main():
@@ -76,7 +80,8 @@ def main():
         pygame.draw.circle(game.canvas, WHITE, [game.WIDTH//2, game.HEIGHT//2], 70, 1)
         sorting_data = [current_other_users[0], current_other_users[1], current_other_users[2], [my_user, my_paddle_pos]]
         user1, user2, user3, user4 = OrderUsers(sorting_data)
-        game.game_setup(user1, user2, user3, user4)
+        game.game_setup(user1[0], user2[0], user3[0], user4[0])
+        game.active_users(user1[1], user2[1], user3[1], user4[1])
         game.gameplay(ball_vel)
         for event in pygame.event.get():
             if(event.type == KEYDOWN):
