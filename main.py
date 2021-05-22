@@ -4,7 +4,7 @@
 # Date: 22.5.2021
 # This is the main script that will be run on the client side for running the game.
 
-import pygame
+import pygame, sys
 from pygame.locals import *
 import Game.pong_class as pc
 import Backend.network as network
@@ -51,34 +51,38 @@ def main():
     my_user = my_info[0][0]
     my_paddle_pos = my_info[0][1]
     data = my_paddle_pos
-    game = pc.pong_class(num_of_users=1) # initialize it as 1 until it gets updated in the loop
+    num_users = 1
+    game = pc.pong_class(num_of_users=num_users) # initialize it as 1 until it gets updated in the loop
     # spawn the ball
     game.spawn_ball(my_info[1])
-
+    
     while(running):
         current_other_users = n.send(data)
-        new_num_users = current_other_users[0][3] + current_other_users[1][3] + current_other_users[2][3]
+        new_num_users = current_other_users[0][3] + current_other_users[1][3] + current_other_users[2][3] + 1
         ball_vel = current_other_users[-1] # It will be the last value
         if(new_num_users != num_users):
             print("A new user has joined.")
             num_users = new_num_users
+            print(num_users)
             game = pc.pong_class(num_of_users=num_users)
             game.spawn_ball(ball_vel)
         current_other_users.append(my_paddle_pos)
-        user1, user2, user3, user4 = OrderUsers(current_other_users)
+        sorting_data = [current_other_users[0], current_other_users[1], current_other_users[2], [my_user, my_paddle_pos]]
+        user1, user2, user3, user4 = OrderUsers(sorting_data)
         game.game_setup(user1, user2, user3, user4)
         game.gameplay(ball_vel)
-        for event in pygame.even.get():
+        for event in pygame.event.get():
             if(event.type == KEYDOWN):
                 game.key_down(event, my_user)
             elif(event.type == KEYUP):
                 game.key_up(event, my_user)
             elif(event.type == K_ESCAPE):
-                running = False
+                pygame.quit()
+                sys.exit()
         my_paddle_pos = game.paddle_pos[my_user + 1]
         data = my_paddle_pos
+        pygame.display.flip()
         pygame.display.update()
         game.fps.tick(60)
 
-
-
+main()

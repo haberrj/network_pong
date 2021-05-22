@@ -72,7 +72,6 @@ class pong_class(object):
                 self.paddle_pos[2] = user3
                 if(self.num_of_users == 4):
                     self.paddle_pos[3] = user4
-        self.ball_pos = [self.WIDTH/2, self.HEIGHT/2]
     
     def spawn_ball(self, ball_vel):
         '''Will spawn the ball based on the position received from the server.
@@ -87,6 +86,7 @@ class pong_class(object):
         or vertically.
         '''
         counter = 0
+        print(self.paddle_pos)
         for paddle_i in self.paddle_pos:
             if(counter + 1 > self.num_of_users):
                 break
