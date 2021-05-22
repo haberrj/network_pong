@@ -24,10 +24,10 @@ def OrderUsers(data):
     @return user3_pos: A list with the position of user 3
     @return user4_pos: A list with the position of user 4
     '''
-    user1_pos = []
-    user2_pos = []
-    user3_pos = []
-    user4_pos = []
+    user1_pos = [0,0]
+    user2_pos = [0,0]
+    user3_pos = [0,0]
+    user4_pos = [0,0]
     for val in data:
         if(val[0] == 1):
             user1_pos[0] = val[1]
@@ -54,7 +54,7 @@ def main():
     my_info = n.getP() # This is the received value from the server
     print("Connected to Server!")
     my_user = my_info[0][0]
-    print("You are User 1")
+    print("You are User", my_user)
     my_paddle_pos = my_info[0][1]
     data = my_paddle_pos
     num_users = 1
@@ -78,7 +78,7 @@ def main():
             game.spawn_ball(ball_vel)
         game.canvas.fill(BLACK)
         pygame.draw.circle(game.canvas, WHITE, [game.WIDTH//2, game.HEIGHT//2], 70, 1)
-        sorting_data = [current_other_users[0], current_other_users[1], current_other_users[2], [my_user, my_paddle_pos]]
+        sorting_data = [current_other_users[0], current_other_users[1], current_other_users[2], [my_user, my_paddle_pos, 1]]
         user1, user2, user3, user4 = OrderUsers(sorting_data)
         game.game_setup(user1[0], user2[0], user3[0], user4[0])
         game.active_users(user1[1], user2[1], user3[1], user4[1])

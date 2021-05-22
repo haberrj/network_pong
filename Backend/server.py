@@ -14,7 +14,7 @@ GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 YELLOW = (255, 255, 0)
 
-def threaded_client(conn, player, current_player):
+def threaded_client(conn, player):
     conn.send(pickle.dumps([players[player], ball_vel]))
     reply = ''
     while(True):
@@ -43,7 +43,7 @@ def threaded_client(conn, player, current_player):
         except:
             break
     players[player] = default_players[player] # resets the player for the rest
-    current_player = player - 1
+    connected_players[player] = 0
     print("Lost Connection to Client: ", player + 1)
     conn.close()
 
@@ -64,6 +64,7 @@ print("Waiting for connection of client. Server has been started.")
 ball_vel = [random.randrange(2,4), random.randrange(1,3)]
 players = [[1, [4, 300], 0], [2, [596, 300], 0], [3, [300, 4], 0], [4, [300, 596], 0]]
 default_players = [[1, [4, 300], 0], [2, [596, 300], 0], [3, [300, 4], 0], [4, [300, 596], 0]]
+connected_players = [0, 0, 0, 0]
 
 current_player = 0
 total = []
@@ -72,5 +73,7 @@ while(True):
     conn, address = s.accept()
     print("Connected to:", address)
     ball_vel = [random.randrange(2,4), random.randrange(1,3)]
-    start_new_thread(threaded_client, (conn, current_player, current_player))
+    start_new_thread(threaded_client, (conn, current_player))
+    connected_players[current_player] = 1
+    print(connected_players)
     current_player += 1
