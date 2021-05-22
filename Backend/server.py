@@ -35,8 +35,8 @@ def threaded_client(conn, player):
                     reply = [players[0], players[1], players[3], ball_vel]
                 else: # user4
                     reply = [players[0], players[1], players[2], ball_vel]
-                print("Received: ", data)
-                # print("Sending: ", reply)
+                print("Received from Player", player, ":", data)
+                print("Sending to Player", player, ':', reply)
             conn.sendall(pickle.dumps(reply))
         except:
             break
