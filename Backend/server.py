@@ -72,7 +72,9 @@ while(True):
     conn, address = s.accept()
     print("Connected to:", address)
     ball_vel = [random.randrange(2,4), random.randrange(1,3)]
-    start_new_thread(threaded_client, (conn, current_player))
+    for player in connected_players:
+        if(player == 0): # this will get the first one available that isn't being used
+            current_player = player
     connected_players[current_player] = 1
-    print(connected_players)
-    current_player += 1
+    start_new_thread(threaded_client, (conn, current_player))
+    # current_player += 1
