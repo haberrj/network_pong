@@ -58,7 +58,12 @@ def main():
     
     while(running):
         current_other_users = n.send(data)
-        new_num_users = current_other_users[0][3] + current_other_users[1][3] + current_other_users[2][3] + 1
+        print(current_other_users)
+        try:
+            new_num_users = current_other_users[0][3] + current_other_users[1][3] + current_other_users[2][3] + 1
+        except IndexError as e:
+            print(e)
+            continue
         ball_vel = current_other_users[-1] # It will be the last value
         if(new_num_users != num_users):
             print("A new user has joined.")
@@ -66,11 +71,14 @@ def main():
             print(num_users)
             game = pc.pong_class(num_of_users=num_users)
             game.spawn_ball(ball_vel)
-        current_other_users.append(my_paddle_pos)
+        game.canvas.fill(BLACK)
+        pygame.draw.circle(game.canvas, WHITE, [game.WIDTH//2, game.HEIGHT//2], 70, 1)
         sorting_data = [current_other_users[0], current_other_users[1], current_other_users[2], [my_user, my_paddle_pos]]
         user1, user2, user3, user4 = OrderUsers(sorting_data)
+        print("Ball velocity", ball_vel)
         game.game_setup(user1, user2, user3, user4)
         game.gameplay(ball_vel)
+        print(my_user)
         for event in pygame.event.get():
             if(event.type == KEYDOWN):
                 game.key_down(event, my_user)

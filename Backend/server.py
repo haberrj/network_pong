@@ -71,6 +71,7 @@ while(True):
     lst.append(conn)
     lst.append(address)
     ball_vel = [random.randrange(2,4), random.randrange(1,3)]
+    print(len(total))
     if(len(total) > 0):
         conn1 = lst[0]
         address1 = lst[1]

@@ -86,7 +86,6 @@ class pong_class(object):
         or vertically.
         '''
         counter = 0
-        print(self.paddle_pos)
         for paddle_i in self.paddle_pos:
             if(counter + 1 > self.num_of_users):
                 break
@@ -248,20 +247,3 @@ class pong_class(object):
             self.paddle_vel[user-1] = 0
         elif(event.key in (K_LEFT, K_RIGHT)):
             self.paddle_vel[user-1] = 0
-    
-    def execute_game(self):
-        '''Will execute the initializations and the gameplay
-        '''
-        self.init_game_setup()
-        while(True):
-            self.gameplay()
-            for event in pygame.event.get():
-                if(event.type == KEYDOWN):
-                    self.key_down(event)
-                elif(event.type == KEYUP):
-                    self.key_up(event)
-                elif(event.type == QUIT):
-                    pygame.quit()
-                    sys.exit()
-            pygame.display.update()
-            self.fps.tick(60)
