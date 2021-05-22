@@ -75,7 +75,7 @@ def main():
         pygame.draw.circle(game.canvas, WHITE, [game.WIDTH//2, game.HEIGHT//2], 70, 1)
         sorting_data = [current_other_users[0], current_other_users[1], current_other_users[2], [my_user, my_paddle_pos]]
         user1, user2, user3, user4 = OrderUsers(sorting_data)
-        print("Ball velocity", ball_vel)
+        # print("Ball velocity", ball_vel)
         game.game_setup(user1, user2, user3, user4)
         game.gameplay(ball_vel)
         print(my_user)
@@ -89,6 +89,7 @@ def main():
                 sys.exit()
         my_paddle_pos = game.paddle_pos[my_user + 1]
         data = my_paddle_pos
+        print(data)
         pygame.display.flip()
         pygame.display.update()
         game.fps.tick(60)
