@@ -64,7 +64,6 @@ class pong_class(object):
                 self.paddle_pos[2] = [self.WIDTH/2, self.HALF_PAD_WIDTH - 1]
                 if(self.num_of_users == 4):
                     self.paddle_pos[3] = [self.WIDTH/2, self.HEIGHT + 1 - self.HALF_PAD_WIDTH]
-        print(self.paddle_pos)
         self.spawn_ball(random.randrange(0,4))
 
     def spawn_ball(self, side):
@@ -192,7 +191,7 @@ class pong_class(object):
                 self.spawn_ball(2)
             if(self.num_of_users > 2):
                 # Top side 
-                if((int(self.ball_vel[1]) <= self.BALL_RADIUS + self.PAD_WIDTH) and (int(self.ball_pos[0]) in range(int(self.paddle_pos[2][0]) - int(self.HALF_PAD_HEIGHT), int(self.paddle_pos[2][0]) + int(self.HALF_PAD_HEIGHT), 1))):
+                if((int(self.ball_pos[1]) <= self.BALL_RADIUS + self.PAD_WIDTH) and (int(self.ball_pos[0]) in range(int(self.paddle_pos[2][0]) - int(self.HALF_PAD_HEIGHT), int(self.paddle_pos[2][0]) + int(self.HALF_PAD_HEIGHT), 1))):
                     self.ball_vel[1] = -1.1 * self.ball_vel[1]
                     self.ball_vel[0] *= 1.1
                 elif(int(self.ball_pos[1]) <= self.BALL_RADIUS + self.PAD_WIDTH):
