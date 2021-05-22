@@ -6,7 +6,7 @@
 
 import socket, sys, pickle
 from _thread import *
-from random import randint
+import random
 
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -16,25 +16,25 @@ YELLOW = (255, 255, 0)
 
 def threaded_client(conn, player):
     # Will need to figure out what to send for player
-    conn.send(pickle.dumps(player))
+    conn.send(pickle.dumps([players[player], ball_vel]))
     reply = ''
     while(True):
         try:
             data = pickle.loads(conn.recv(2048))
-            # insert data
-
+            players[player][1] = data[0] # The position of the player
+            players[player][2] = 1
             if not data:
                 print("Disconnected")
                 break
             else:
-                if(player == 1):
-                    reply = "player1"
-                elif(player == 2):
-                    reply = "player2"
-                elif(player == 3):
-                    reply = "player3"
-                else:
-                    reply = "player4"
+                if(player == 0): # user1
+                    reply = [players[1], players[2], players[3], ball_vel]
+                elif(player == 1): # user2
+                    reply = [players[0], players[2], players[3], ball_vel]
+                elif(player == 2): # user3 
+                    reply = [players[0], players[1], players[3], ball_vel]
+                else: # user4
+                    reply = [players[0], players[1], players[2], ball_vel]
                 print("Received: ", data)
                 print("Sending: ", reply)
             conn.sendall(pickle.dumps(reply))
@@ -54,6 +54,12 @@ except socket.error as e:
 
 s.listen()
 print("Waiting for connection of client. Server has been started.")
+
+# This will be the initial position of every paddle.
+# Each array is broken up as [user_num, paddle position, connected]
+ball_vel = [random.randrange(2,4), random.randrange(1,3)]
+players = [[1, [4, 300], 0], [2, [10, 100], [596, 300], 0], [3, [100, 10], [300, 4], 0], [4, [100, 10], [300, 596], 0]]
+
 
 current_player = 0
 total = []

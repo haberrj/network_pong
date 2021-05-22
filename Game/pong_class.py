@@ -53,43 +53,34 @@ class pong_class(object):
         # Drawing elements
         self.canvas = pygame.display.set_mode((self.WIDTH, self.HEIGHT), 0, 32)
         pygame.display.set_caption('Network Based Pong')
+        self.canvas.fill(BLACK)
+        pygame.draw.circle(self.canvas, WHITE, [self.WIDTH//2, self.HEIGHT//2], 70, 1)
 
-    def init_game_setup(self):
+    def game_setup(self, user1, user2, user3, user4):
         '''Will setup the initial starting positions of each paddle if they exist based on the input.
         Once paddles are setup, the ball will be spawned.
+        @param user1: A list with the position of user 1
+        @param user2: A list with the position of user 2
+        @param user3: A list with the position of user 3
+        @param user4: A list with the position of user 4
+        @param ball_vel: A list with the x and y velocities of the ball to be initialized
         '''
-        self.paddle_pos[0] = [self.HALF_PAD_WIDTH - 1, self.HEIGHT/2] # Paddle 1 will always be initialized
+        self.paddle_pos[0] = user1 # Paddle 1 will always be initialized
         if(self.num_of_users > 1): # Cascading if statements since as the number is increased all other users are required
-            self.paddle_pos[1] = [self.WIDTH + 1 - self.HALF_PAD_WIDTH, self.HEIGHT/2]
+            self.paddle_pos[1] = user2
             if(self.num_of_users > 2):
-                self.paddle_pos[2] = [self.WIDTH/2, self.HALF_PAD_WIDTH - 1]
+                self.paddle_pos[2] = user3
                 if(self.num_of_users == 4):
-                    self.paddle_pos[3] = [self.WIDTH/2, self.HEIGHT + 1 - self.HALF_PAD_WIDTH]
-        self.spawn_ball(random.randrange(0,4))
-
-    def spawn_ball(self, side):
-        '''Will spawn the ball on a given side. [up=0, down=1, right=2, left=3]
-        @param side: An integer between 0 and 3 which will choose the spawn
-                    of the ball.
-                    0 - up, 1 - down, 2 - right, 3 - left
-        '''
-        # Error handling
-        if(type(side) != int):
-            raise TypeError("side must be of integer type")
-        elif((side > 3) or (side < 0)):
-            raise ValueError("side must be an integer between 0 and 3")
+                    self.paddle_pos[3] = user4
         self.ball_pos = [self.WIDTH/2, self.HEIGHT/2]
-        horz = random.randrange(2,4)
-        vert = random.randrange(1,3)
-        if(side == 0): # up
-            self.ball_vel = [vert, -1 * horz]
-        elif(side == 1): # down
-            self.ball_vel = [-1 * vert, -1 * horz]
-        elif(side == 2): # right
-            self.ball_vel = [horz, -1 * vert]
-        else: # left
-            self.ball_vel = [-1 * horz, -1 * vert]
     
+    def spawn_ball(self, ball_vel):
+        '''Will spawn the ball based on the position received from the server.
+        @param ball_vel: A list of the velocities of the ball as outlined by the server.
+        '''
+        self.ball_vel = ball_vel
+        self.ball_pos = [self.WIDTH/2, self.HEIGHT/2]
+
     def update_paddle_pos(self):
         '''This will update the paddle positions so that they are continuously updated and remain on screen.
         There is a difference between users 1 & 2 and users 3 & 4 since due to the nature of moving horizontally
@@ -171,8 +162,9 @@ class pong_class(object):
                     if((int(self.ball_pos[0] >= self.WIDTH + 1 - self.BALL_RADIUS))): # Right wall
                         self.ball_vel[0] = -1 * self.ball_vel[0]
 
-    def determine_paddles(self):
+    def determine_paddles(self, ball_vel):
         '''Will determine which walls have paddles and which score.
+        @param ball_vel: A list containing the velocities of the ball.
         '''
         # Left side
         if((int(self.ball_pos[0]) <= self.BALL_RADIUS + self.PAD_WIDTH) and (int(self.ball_pos[1]) in range(int(self.paddle_pos[0][1]) - int(self.HALF_PAD_HEIGHT), int(self.paddle_pos[0][1]) + int(self.HALF_PAD_HEIGHT),1))):
@@ -181,7 +173,7 @@ class pong_class(object):
             self.ball_vel[1] *= 1.1
         elif(int(self.ball_pos[0]) <= self.BALL_RADIUS + self.PAD_WIDTH):
             self.scores[0] += -1 
-            self.spawn_ball(3)
+            self.spawn_ball(ball_vel)
         if(self.num_of_users > 1):
             # Right side
             if(int(self.ball_pos[0]) >= self.WIDTH + 1 - self.BALL_RADIUS - self.PAD_WIDTH) and (int(self.ball_pos[1]) in range(int(self.paddle_pos[1][1]) - int(self.HALF_PAD_HEIGHT),int(self.paddle_pos[1][1]) + int(self.HALF_PAD_HEIGHT),1)):
@@ -189,7 +181,7 @@ class pong_class(object):
                 self.ball_vel[1] *= 1.1
             elif(int(self.ball_pos[0]) >= self.WIDTH + 1 - self.BALL_RADIUS - self.PAD_WIDTH):
                 self.scores[1] += -1
-                self.spawn_ball(2)
+                self.spawn_ball(ball_vel)
             if(self.num_of_users > 2):
                 # Top side 
                 if((int(self.ball_pos[1]) <= self.BALL_RADIUS + self.PAD_WIDTH) and (int(self.ball_pos[0]) in range(int(self.paddle_pos[2][0]) - int(self.HALF_PAD_HEIGHT), int(self.paddle_pos[2][0]) + int(self.HALF_PAD_HEIGHT), 1))):
@@ -197,7 +189,7 @@ class pong_class(object):
                     self.ball_vel[0] *= 1.1
                 elif(int(self.ball_pos[1]) <= self.BALL_RADIUS + self.PAD_WIDTH):
                     self.scores[2] += -1
-                    self.spawn_ball(0)
+                    self.spawn_ball(ball_vel)
                 if(self.num_of_users > 3):
                     # Bottom side
                     if((int(self.ball_pos[1]) >= self.HEIGHT + 1 - self.BALL_RADIUS - self.PAD_WIDTH) and (int(self.ball_pos[0]) in range(int(self.paddle_pos[3][0]) - int(self.HALF_PAD_HEIGHT), int(self.paddle_pos[3][0]) + int(self.HALF_PAD_HEIGHT), 1))):
@@ -205,13 +197,12 @@ class pong_class(object):
                         self.ball_vel[0] *= 1.1
                     elif(int(self.ball_pos[1]) >= self.HEIGHT + 1 - self.BALL_RADIUS - self.PAD_WIDTH):
                         self.scores[3] += -1
-                        self.spawn_ball(1)
+                        self.spawn_ball(ball_vel)
 
-    def gameplay(self):
+    def gameplay(self, ball_vel):
         '''Will draw the game on the screen and execute the game itself.
+        @param ball_vel: A list containing the velocities of the ball sent from the server.
         '''
-        self.canvas.fill(BLACK)
-        pygame.draw.circle(self.canvas, WHITE, [self.WIDTH//2, self.HEIGHT//2], 70, 1)
         self.update_paddle_pos()
         # Update the ball position
         self.ball_pos[0] += int(self.ball_vel[0])
@@ -220,11 +211,11 @@ class pong_class(object):
         # Determine which sides are walls
         self.determine_walls()
         # Determine when the ball has hit a paddle
-        self.determine_paddles()
+        self.determine_paddles(ball_vel)
         # Update the scores
         self.update_scores()
 
-    def key_down(self, event):
+    def key_down(self, event, user):
         '''Will determine what happens when specific keys are pressed.
         Will need to be changed to incorporate networked systems but for
         now will remain local.
@@ -232,37 +223,31 @@ class pong_class(object):
         User 2 = UP & DOWN
         User 3 = A & D
         User 4 = RIGHT & LEFT
+        @param event: The key event captured.
+        @param user: An integer representing the actual user.
         '''
-        if(event.key == K_w):
-            self.paddle_vel[0] = -8
-        elif(event.key == K_s):
-            self.paddle_vel[0] = 8
-        elif(event.key == K_UP):
-            self.paddle_vel[1] = -8
-        elif(event.key == K_DOWN):
-            self.paddle_vel[1] = 8
-        elif(event.key == K_a):
-            self.paddle_vel[2] = -8
-        elif(event.key == K_d):
-            self.paddle_vel[2] = 8
-        elif(event.key == K_LEFT):
-            self.paddle_vel[3] = -8
-        elif(event.key == K_RIGHT):
-            self.paddle_vel[3] = 8
+        if(user < 3): # for user input 1 or 2
+            if(event.key == K_UP):
+                self.paddle_vel[user-1] = -8
+            elif(event.key == K_DOWN):
+                self.paddle_vel[user-1] = 8
+        else:
+            if(event.key == K_LEFT):
+                self.paddle_vel[user-1] = -8
+            elif(event.key == K_RIGHT):
+                self.paddle_vel[user-1] = 8
     
-    def key_up(self, event):
+    def key_up(self, event, user):
         '''Will determine what happens when the specific keys are released.
         Will need to be changed later to incorporate networking but will work
         for now for local purposes.
+        @param event: The key event captured.
+        @param user: An integer representing the actual user.
         '''
-        if(event.key in (K_w, K_s)):
-            self.paddle_vel[0] = 0
-        elif(event.key in (K_UP, K_DOWN)):
-            self.paddle_vel[1] = 0
-        elif(event.key in (K_a, K_d)):
-            self.paddle_vel[2] = 0
+        if(event.key in (K_UP, K_DOWN)):
+            self.paddle_vel[user-1] = 0
         elif(event.key in (K_LEFT, K_RIGHT)):
-            self.paddle_vel[3] = 0
+            self.paddle_vel[user-1] = 0
     
     def execute_game(self):
         '''Will execute the initializations and the gameplay
