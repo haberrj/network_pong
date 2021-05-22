@@ -21,7 +21,7 @@ def threaded_client(conn, player):
     while(True):
         try:
             data = pickle.loads(conn.recv(2048))
-            players[player][1] = data[0] # The position of the player
+            players[player][1] = data # The position of the player
             players[player][2] = 1
             if not data:
                 print("Disconnected")
@@ -58,7 +58,7 @@ print("Waiting for connection of client. Server has been started.")
 # This will be the initial position of every paddle.
 # Each array is broken up as [user_num, paddle position, connected]
 ball_vel = [random.randrange(2,4), random.randrange(1,3)]
-players = [[1, [4, 300], 0], [2, [10, 100], [596, 300], 0], [3, [100, 10], [300, 4], 0], [4, [100, 10], [300, 596], 0]]
+players = [[1, [4, 300], 0], [2, [596, 300], 0], [3, [300, 4], 0], [4, [300, 596], 0]]
 
 
 current_player = 0

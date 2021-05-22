@@ -60,7 +60,7 @@ def main():
         current_other_users = n.send(data)
         print(current_other_users)
         try:
-            new_num_users = current_other_users[0][3] + current_other_users[1][3] + current_other_users[2][3] + 1
+            new_num_users = current_other_users[0][2] + current_other_users[1][2] + current_other_users[2][2] + 1
         except IndexError as e:
             print(e)
             continue
