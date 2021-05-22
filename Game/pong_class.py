@@ -4,7 +4,7 @@
 # Date: 22.5.2021
 # A class to create the game for use within the network
 
-from Game.game import HALF_PAD_WIDTH, HEIGHT
+from Game.game import BALL_RADIUS, HALF_PAD_WIDTH, HEIGHT, PAD_WIDTH, spawn_ball
 import random
 import pygame, sys
 from pygame.locals import *
@@ -48,6 +48,7 @@ class pong_class(object):
         self.paddle_vel = [0, 0, 0, 0]
         # Setting the paddle positions
         self.paddle_pos = [[0,0], [0,0], [0,0], [0,0]] # 1 is left, 2 is right, 3 is up, 4 is down
+        # need to come up with a scoring system. It might be out of scope due to time restrictions so for now scores will be negative (i.e. loser based)
         self.scores = [0, 0, 0, 0] # Even if the last 2 values are not required it doesn't use much memory
         # Drawing elements
         self.canvas = pygame.display.set_mode((self.WIDTH, self.HEIGHT), 0, 32)
@@ -70,6 +71,7 @@ class pong_class(object):
         '''Will spawn the ball on a given side. [up=0, down=1, right=2, left=3]
         @param side: An integer between 0 and 3 which will choose the spawn
                     of the ball.
+                    0 - up, 1 - down, 2 - right, 3 - left
         '''
         # Error handling
         if(type(side) != int):
@@ -83,7 +85,7 @@ class pong_class(object):
             self.ball_vel = [vert, -1 * horz]
         elif(side == 1): # down
             self.ball_vel = [-1 * vert, -1 * horz]
-        elif(side == 3): # right
+        elif(side == 2): # right
             self.ball_vel = [horz, -1 * vert]
         else: # left
             self.ball_vel = [-1 * horz, -1 * vert]
@@ -153,6 +155,58 @@ class pong_class(object):
                 if(self.num_of_users > 3):
                     self.canvas.blit(label_user4, (self.WIDTH/2, self.HEIGHT - 2*self.PAD_WIDTH))
 
+    def determine_walls(self):
+        '''Will determine which walls the ball will bounce off of.
+        '''
+        # Check if less than 4 players, since with 4 players theres no walls
+        if(self.num_of_users == 4):
+            return
+        elif(self.num_of_users < 4):
+            if(int(self.ball_pos[1] >= self.HEIGHT + 1 - self.BALL_RADIUS)): # Bottom wall
+                self.ball_vel[1] = -1 * self.ball_vel[1]
+            if(self.num_of_users < 3):
+                if(int(self.ball_pos[1] <= BALL_RADIUS)): # Top wall
+                    self.ball_vel[1] = -1 * self.ball_vel[1]
+                if(self.num_of_users < 2):
+                    if((int(self.ball_pos[0] >= self.WIDTH + 1 - self.BALL_RADIUS))): # Right wall
+                        self.ball_vel[0] = -1 * self.ball_vel[0]
+
+    def determine_paddles(self):
+        '''Will determine which walls have paddles and which score.
+        '''
+        # Left side
+        if((int(self.ball_pos[0]) <= self.BALL_RADIUS + self.PAD_WIDTH) and (int(self.ball_pos[1]) in range(int(self.paddle_pos[0][1]) - int(self.HALF_PAD_HEIGHT), int(self.paddle_pos[0][1]) + int(self.HALF_PAD_HEIGHT),1))):
+            # Checking if the ball is within the area where the paddle is
+            self.ball_vel[0] = -1.1 * self.ball_vel[0] # slightly increase the difficulty by 10%
+            self.ball_vel[1] *= 1.1
+        elif(int(self.ball_pos[0]) <= self.BALL_RADIUS + self.PAD_WIDTH):
+            self.score[0] += -1 
+            self.spawn_ball(3)
+        if(self.num_of_users > 1):
+            # Right side
+            if(int(self.ball_pos[0]) >= self.WIDTH + 1 - self.BALL_RADIUS - self.PAD_WIDTH) and (int(self.ball_pos[1]) in range(int(self.paddle_pos[1][1]) - int(self.HALF_PAD_HEIGHT),int(self.paddle_pos[1][1]) + int(self.HALF_PAD_HEIGHT),1)):
+                self.ball_vel[0] = -1.1 * self.ball_vel[0]
+                self.ball_vel[1] *= 1.1
+            elif(int(self.ball_pos[0]) >= self.WIDTH + 1 - self.BALL_RADIUS - self.PAD_WIDTH):
+                self.score[1] += -1
+                self.spawn_ball(2)
+            if(self.num_of_users > 2):
+                # Top side 
+                if((int(self.ball_vel[1]) <= self.BALL_RADIUS + self.PAD_WIDTH) and (int(self.ball_pos[0]) in range(int(self.paddle_pos[2][0]) - int(self.HALF_PAD_HEIGHT), int(self.paddle_pos[2][0]) + int(self.HALF_PAD_HEIGHT), 1))):
+                    self.ball_vel[1] = -1.1 * self.ball_vel[1]
+                    self.ball_vel[0] *= 1.1
+                elif(int(self.ball_pos[1]) <= self.BALL_RADIUS + self.PAD_WIDTH):
+                    self.score[2] += -1
+                    self.spawn_ball(0)
+                if(self.num_of_users > 3):
+                    # Bottom side
+                    if((int(self.ball_pos[1]) >= self.HEIGHT + 1 - self.BALL_RADIUS - self.PAD_WIDTH) and (int(self.ball_pos[0]) in range(int(self.paddle_pos[3][0]) - int(self.HALF_PAD_HEIGHT), int(self.paddle_pos[3][0]) + int(self.HALF_PAD_HEIGHT), 1))):
+                        self.ball_vel[1] = -1.1 * self.ball_vel[1]
+                        self.ball_vel[0] *= 1.1
+                    elif(int(self.ball_pos[1]) >= self.HEIGHT + 1 - self.BALL_RADIUS - self.PAD_WIDTH):
+                        self.score[3] += -1
+                        self.spawn_ball(1)
+
     def gameplay(self):
         '''Will draw the game on the screen and execute the game itself.
         '''
@@ -164,9 +218,9 @@ class pong_class(object):
         self.ball_pos[1] += int(self.ball_vel[1])
         pygame.draw.circle(self.canvas, RED, self.ball_pos, 20, 0)
         # Determine which sides are walls
-        
+        self.determine_walls()
         # Determine when the ball has hit a paddle
-
+        self.determine_paddles()
         # Update the scores
         self.update_scores()
 
