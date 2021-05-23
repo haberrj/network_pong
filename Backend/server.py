@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(description="The server script for the pong gam
 parser.add_argument("-i", "--ip", type=str, required=True, help="The IP address of the server.")
 parser.add_argument("-p", "--port", type=int, required=True, help="The Port of the server to access.")
 
-args = parser.args
+args = parser.parse_args()
 server = args.ip
 port = args.port
 
